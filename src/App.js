@@ -1,25 +1,143 @@
-import logo from './logo.svg';
 import './App.css';
+import React, { useState, useEffect } from "react"
 
-function App() {
+const init = [
+  {
+    id: 0,
+    name: "None",
+    isActive: false,
+    seconds: 0,
+  },
+]
+const initActive = {
+  id: 1,
+  name: "Start A New Task",
+  isActive: true,
+  seconds: 0,
+}
+const TaskList = ({ allTasks, activeTask, setActiveTask, setAllTasks }) => {
+  return (
+    <ul>
+      {allTasks.map((item) => (
+        <Task Task={item} allTasks={allTasks} activeTask={activeTask} setActiveTask={setActiveTask} setAllTasks={setAllTasks} />
+      ))}
+    </ul>
+  )
+}
+
+const Task = ({ Task, allTasks, activeTask, setActiveTask, setAllTasks }) => {
+  const handleOnClick = () => {
+    //const index = allTasks.findIndex((element)=>element.name === Task.name)
+    setAllTasks(allTasks.filter((element)=>element.name !== Task.name))
+    if(activeTask){
+      setAllTasks((prev)=> [...prev, activeTask])
+    }
+    setActiveTask(Task)
+  }
+  const minutes = Math.floor(Task.seconds / 60) > 0 && (", " + Math.floor(Task.seconds / 60) + " Minutes, ")
+  const hours = Math.floor(Task.seconds / 3600) > 0 && (Math.floor(Task.seconds / 3600) + "Hours")
+  return (
+    <div>
+    <li key={Task.id}>{Task.name}: {Math.floor(Task.seconds % 60)} Seconds {minutes} {hours}</li>
+    <button onClick={handleOnClick}> Restart Task</button>
+    </div>
+  )
+}
+
+const ActiveTask = ({ setAllTasks, Task, setActiveTask }) => {
+  const handleOnClik = () => {
+    setAllTasks((prev) => [
+      ...prev,
+      Task
+    ]);
+    setActiveTask({})
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTask((prev) => {
+        return { ...prev, seconds: prev.seconds + 1 }
+      })
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const minutes = Math.floor(Task.seconds / 60) > 0 && (", " + Math.floor(Task.seconds / 60) + " Minutes, ")
+  const hours = Math.floor(Task.seconds / 3600) > 0 && (Math.floor(Task.seconds / 3600) + "Hours")
+  if (!Task.name) { return <h1> No Active Tasks</h1> }
+  return (
+    <div>
+      <h1>{Task.name}: {Math.floor(Task.seconds % 60)} Seconds {minutes} {hours}</h1>
+      <button onClick={handleOnClik}>Stop Task</button>
+    </div>
+  )
+}
+
+
+const TaskForm = ({ allTasks, activeTask, setActiveTask, setAllTasks }) => {
+  const [newTask, setNewTask] = useState({})
+
+  const handleChange = ({ target }) => {
+    const { name, value } = target;
+    setNewTask((prev) => ({
+      ...prev,
+      seconds: 0,
+      [name]: value,
+      id: Date.now()
+
+    }));
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(allTasks)
+    console.log(activeTask)
+    console.log(newTask)
+    const test = allTasks.findIndex((element) => {return element.name === newTask.name }) === -1
+    const activeTest = activeTask.name === newTask.name
+    if (!test || activeTest) {
+      alert("This Task Already Exists")
+
+    }
+    else if(!newTask.name){
+      alert("Must enter a valid task!")
+    }
+    else {
+      setAllTasks((prev) => [
+        ...prev,
+        activeTask
+      ]);
+      setActiveTask(newTask)
+      setNewTask({})
+    }
+
+  }
+
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        Start a new task:
+        <input type="text" name="name" onChange={handleChange} />
+      </label>
+      <input type="submit" value="Start" />
+    </form>
+  )
+}
+
+const App = () => {
+
+  const [allTasks, setAllTasks] = useState(init)
+  const [activeTask, setActiveTask] = useState(initActive)
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <TaskForm allTasks={allTasks} activeTask={activeTask} setActiveTask={setActiveTask} setAllTasks={setAllTasks} />
+      <ActiveTask setAllTasks={setAllTasks} Task={activeTask} setActiveTask={setActiveTask} />
+      <TaskList allTasks={allTasks} activeTask={activeTask} setActiveTask={setActiveTask} setAllTasks={setAllTasks} />
     </div>
   );
+
 }
 
 export default App;
