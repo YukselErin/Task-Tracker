@@ -34,7 +34,7 @@ const Task = ({ Task, allTasks, activeTask, setActiveTask, setAllTasks }) => {
   const handleOnClick = () => {
     //const index = allTasks.findIndex((element)=>element.name === Task.name)
     setAllTasks(allTasks.filter((element)=>element.name !== Task.name))
-    if(activeTask){
+    if(activeTask.name){
       setAllTasks((prev)=> [...prev, activeTask])
     }
     setActiveTask(Task)
@@ -44,15 +44,15 @@ const Task = ({ Task, allTasks, activeTask, setActiveTask, setAllTasks }) => {
     setAllTasks(allTasks.filter((element)=>element.name !== Task.name))
   }
 
-  const minutes = Math.floor(Task.seconds / 60) > 0 && (", " + Math.floor(Task.seconds / 60) + " Minutes, ")
+  const minutes = Math.floor(Task.seconds / 60) > 0 && (" " + Math.floor(Task.seconds / 60) + " Minutes ")
   const hours = Math.floor(Task.seconds / 3600) > 0 && (Math.floor(Task.seconds / 3600) + "Hours")
   return (
-    <div>
-    <li key={Task.id}>{Task.name}: {Math.floor(Task.seconds % 60)} Seconds {minutes} {hours}</li>
-    <button onClick={handleOnClick}> Restart Task</button>
-    <button onClick={handleDelete}>Delete Task</button>
+    <div class ="task">
+    <li key={Task.id}> {Task.name}:{hours} {minutes} {Math.floor(Task.seconds % 60)} Seconds  </li>
+    <button  class="greenbutton" onClick={handleOnClick}> Restart Task</button>
+    <button class ="redbutton" onClick={handleDelete}>Delete Task</button>
     </div>
-  )
+  ) 
 }
 
 const ActiveTask = ({ setAllTasks, Task, setActiveTask }) => {
@@ -73,13 +73,13 @@ const ActiveTask = ({ setAllTasks, Task, setActiveTask }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const minutes = Math.floor(Task.seconds / 60) > 0 && (", " + Math.floor(Task.seconds / 60) + " Minutes, ")
+  const minutes = Math.floor(Task.seconds / 60) > 0 && (" " + Math.floor(Task.seconds / 60) + " Minutes ")
   const hours = Math.floor(Task.seconds / 3600) > 0 && (Math.floor(Task.seconds / 3600) + "Hours")
   if (!Task.name) { return <h1> No Active Tasks</h1> }
   return (
     <div>
-      <h1>{Task.name}: {Math.floor(Task.seconds % 60)} Seconds {minutes} {hours}</h1>
-      <button onClick={handleOnClik}>Stop Task</button>
+      <h1>{Task.name}: {hours} {minutes} {Math.floor(Task.seconds % 60)} Seconds </h1>
+      <button class = "redbutton" onClick={handleOnClik}>Stop Task</button>
     </div>
   )
 }
@@ -140,7 +140,7 @@ const TaskForm = ({ allTasks, activeTask, setActiveTask, setAllTasks }) => {
   return (
     <form onSubmit={handleSubmit}>
       <label>
-        Start a new task:
+        Start a new task: 
         <input type="text" name="name" onChange={handleChange} />
       </label>
       <input type="submit" value="Start" />
