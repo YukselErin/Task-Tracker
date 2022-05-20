@@ -16,6 +16,11 @@ const initActive = {
   seconds: 0,
 }
 const TaskList = ({ allTasks, activeTask, setActiveTask, setAllTasks }) => {
+  if(!allTasks){
+    return (
+      <h1> No previous tasks!</h1>
+    )
+  }
   return (
     <ul>
       {allTasks.map((item) => (
@@ -93,7 +98,17 @@ const TaskForm = ({ allTasks, activeTask, setActiveTask, setAllTasks }) => {
     console.log(allTasks)
     console.log(activeTask)
     console.log(newTask)
-    const test = allTasks.findIndex((element) => {return element.name === newTask.name }) === -1
+    var test = false
+
+    if(allTasks){
+      test = allTasks.findIndex((element) => {return element.name === newTask.name }) === -1
+      
+    }
+    else{
+      test = true
+      alert("inif")
+    }
+    
     const activeTest = activeTask.name === newTask.name
     if (!test || activeTest) {
       alert("This Task Already Exists")
@@ -127,9 +142,25 @@ const TaskForm = ({ allTasks, activeTask, setActiveTask, setAllTasks }) => {
 
 const App = () => {
 
-  const [allTasks, setAllTasks] = useState(init)
-  const [activeTask, setActiveTask] = useState(initActive)
+  const [allTasks, setAllTasks] = useState(()=>{
+    const storedAllTasks =  localStorage.getItem("AllTasks");
+    const initialValue = JSON.parse(storedAllTasks);
+    return initialValue || ""; 
+})
+  const [activeTask, setActiveTask] = useState(()=>{
+    const storedActiveTasks =  localStorage.getItem("ActiveTasks");
+    const initialValue = JSON.parse(storedActiveTasks);
+    return initialValue|| ""; 
+})
 
+  useEffect(() =>(
+    localStorage.setItem("ActiveTasks", JSON.stringify(activeTask))
+  ),[activeTask])
+
+  useEffect(()=>(
+    localStorage.setItem("AllTasks", JSON.stringify(allTasks))
+  ),[allTasks])
+  
   return (
     <div className="App">
       <TaskForm allTasks={allTasks} activeTask={activeTask} setActiveTask={setActiveTask} setAllTasks={setAllTasks} />
