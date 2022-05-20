@@ -39,12 +39,18 @@ const Task = ({ Task, allTasks, activeTask, setActiveTask, setAllTasks }) => {
     }
     setActiveTask(Task)
   }
+
+  const handleDelete = () => {
+    setAllTasks(allTasks.filter((element)=>element.name !== Task.name))
+  }
+
   const minutes = Math.floor(Task.seconds / 60) > 0 && (", " + Math.floor(Task.seconds / 60) + " Minutes, ")
   const hours = Math.floor(Task.seconds / 3600) > 0 && (Math.floor(Task.seconds / 3600) + "Hours")
   return (
     <div>
     <li key={Task.id}>{Task.name}: {Math.floor(Task.seconds % 60)} Seconds {minutes} {hours}</li>
     <button onClick={handleOnClick}> Restart Task</button>
+    <button onClick={handleDelete}>Delete Task</button>
     </div>
   )
 }
@@ -106,9 +112,9 @@ const TaskForm = ({ allTasks, activeTask, setActiveTask, setAllTasks }) => {
     }
     else{
       test = true
-      alert("inif")
     }
     
+  
     const activeTest = activeTask.name === newTask.name
     if (!test || activeTest) {
       alert("This Task Already Exists")
@@ -118,10 +124,12 @@ const TaskForm = ({ allTasks, activeTask, setActiveTask, setAllTasks }) => {
       alert("Must enter a valid task!")
     }
     else {
-      setAllTasks((prev) => [
-        ...prev,
-        activeTask
-      ]);
+      if(activeTask.name){
+        setAllTasks((prev) => [
+          ...prev,
+          activeTask
+        ]);
+      }
       setActiveTask(newTask)
       setNewTask({})
     }
